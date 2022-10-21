@@ -20,11 +20,9 @@ jobs:
       - name: Run only if user has sufficient permissions
         if: steps.check.outputs.has-permission
         run: echo "Congratulations! Your permissions to access the repository are sufficient."
-      - name: Run only if user has NOT sufficient permissions
-        if: "! steps.check.outputs.has-permission"
-        run: echo "Sorry! Your permissions are insufficient."
         
-      - name: Add comment to PR
+      - name: Add comment to PR if user has sufficient permissions
+        if: "! steps.check.outputs.has-permission"
         env:
           URL: ${{ github.event.pull_request.comments_url }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -34,4 +32,4 @@ jobs:
             $URL \
             -H "Content-Type: application/json" \
             -H "Authorization: token $GITHUB_TOKEN" \
-            --data '{ "body": "blah blah" }'        
+            --data '{ "body": "Sorry! Your permissions are insufficient. Request collaborators to add `safetotest` label to test this PR" }'        
