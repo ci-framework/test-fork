@@ -1,7 +1,7 @@
 name: Action Sample Workflow
 
 # Run workflow when a new pull request is opened
-on: [pull_request]
+on: [pull_request_target]
 
 jobs:
   check_user_permission:
