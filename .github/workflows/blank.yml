@@ -1,32 +1,25 @@
-# This is a basic workflow to help you get started with Actions
+name: Action Sample Workflow
 
-name: CI
+# Run workflow when a new pull request is opened
+on: [push]
 
-# Controls when the workflow will run
-on:
-  push:
-    branches: [ "main" ]
-  pull_request_target:
-    branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  check_user_permission:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    name: A job to check user's permission level
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      # Check for write permission
+      - name: Check user permission
+        id: check
+        uses: scherermichael-oss/action-has-permission@master
         with:
-          ref: ${{ github.event.pull_request.head.sha }}      
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          ls ${{github.workspace}}
+          required-permission: write
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Use the output from the `check` step
+      - name: Run only if user has sufficient permissions
+        if: steps.check.outputs.has-permission
+        run: echo "Congratulations! Your permissions to access the repository are sufficient."
+      - name: Run only if user has NOT sufficient permissions
+        if: "! steps.check.outputs.has-permission"
+        run: echo "Sorry! Your permissions are insufficient."
