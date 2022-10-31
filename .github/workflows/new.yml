@@ -1,0 +1,14 @@
+name: On Label
+
+on:
+  pull_request_target:
+    types: [labeled]
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'lgtm')
+    steps:
+      run: |
+        echo "hello"
